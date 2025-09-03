@@ -1,0 +1,560 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amssymb, amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{titlesec}
+\usepackage{geometry}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{setspace}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{setspace}
+\linespread{1.2}
+% Font for multilingual support (commented out if unavailable)
+\usepackage{DejaVuSans} % Hebrew/Greek
+% \usepackage{Amiri} % Arabic/Persian (if installed)
+\usepackage{hyperref}
+\usepackage{xurl} % Permet de couper les longues URLs automatiquement
+\sloppy % Permet au texte d'être un peu plus flexible
+
+% Page setup
+\geometry{a4paper, margin=2.5cm}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyfoot[C]{Page \thepage\ of \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+% Section formatting
+\titleformat{\section}{\large\bfseries\centering}{}{1em}{}
+
+
+\begin{document}
+\thispagestyle{empty}
+
+%---------------------------------FIRST PAGE----------------------------------------------%
+
+% Header logos and info
+\begin{minipage}{0.2\textwidth}
+    \includegraphics[width=3cm]{insat_logo.png}
+\end{minipage}
+\begin{minipage}{0.5\textwidth}
+    \centering
+    Université de Carthage\\
+    Institut National des Sciences Appliquées et Technologiques\\
+    Ministère des Études Supérieures et de la Recherche Scientifique
+\end{minipage}
+\begin{minipage}{0.2\textwidth}
+    \flushright
+    \includegraphics[width=3cm]{carthage_logo.png}
+\end{minipage}
+
+\vspace{0.5cm}
+\begin{center}
+\rule{\textwidth}{0.4pt}
+\end{center}
+\vspace{0.5cm}
+
+% Title
+\begin{center}
+    {\Large Personal Professional Project:}\\[1em]
+    \textbf{\Huge Stegalens : Intelligent Multimodal Steganography Detection System}\\[1em]
+\end{center}
+
+\vspace{0.5cm}
+\begin{center}
+\rule{0.8\textwidth}{0.3pt}
+\end{center}
+\vspace{0.5cm}
+
+% Field of study
+\begin{center}
+    \Large{Field of study:}\\[0.5cm]
+    \Large\textbf{Computer Networks and Telecommunication}\\[1cm]
+
+    \Large{Prepared by:}\\[0.5cm]
+    \textbf{\Large Ghada Jeddey}\\
+    \textbf{\Large Emna Drihem}\\
+    \textbf{\Large Yasmine Ferjani}\\[1cm]
+
+    \Large{Supervised by:}\\[0.5cm]
+    \Large\textbf{Dr. Wided SOUID MILED}\\[0.5cm]
+
+    \rule{0.8\textwidth}{0.3pt}\\[1cm]
+
+    \textbf{Année Universitaire : 2024 - 2025}
+\end{center}
+
+
+
+
+\newpage    % Start TOC on a new page
+\tableofcontents
+
+\newpage
+
+\section{Project Summary}
+This project develops an intelligent steganalysis system that automatically detects hidden data across multiple file types through specialized deep learning models . The end goal is an integrated interface where users can upload any suspicious file, which the system will automatically classify by type (image, audio, or network packet) and route to the appropriate detection model—analyzing pixel patterns for images, audio waveforms for sound files, or packet structures for network traffic—to determine if the file contains hidden steganographic content and flag potential security risks. The modular design allows each model to specialize in its domain while sharing a unified detection framework.
+This project bridges the gap between theoretical steganalysis research and practical cybersecurity tools, offering a proactive defense against covert data exfiltration.
+\newpage
+\section{Problem statement and Objectives}
+\subsection{Problem Statement}
+Steganography—the practice of hiding data within digital files—poses a growing cybersecurity threat, as malicious actors increasingly use it to conceal malware, exfiltrate sensitive data, or bypass detection systems. Traditional security tools often fail to detect such hidden content, especially when spread across different file types (images, audio, network packets). Manual analysis is impractical due to the volume and complexity of modern digital communications. There is a critical need for an automated, multi-modal steganalysis system capable of accurately identifying steganographic content across diverse file formats while maintaining usability for security professionals.
+
+\subsection{Objectives}
+
+\begin{enumerate}
+    \item \textbf{Develop Specialized Detection Models}
+    \begin{itemize}
+        \item \textbf{Image Steganalysis:} Build a CNN-based model using a modified ResNet34 architecture to detect hidden data in images.
+        \item \textbf{Audio Steganalysis:} Create models to analyze WAV and MP3 files for steganographic content using features such as LPC and MFCC.
+        \item \textbf{Network Steganalysis:} Develop detection mechanisms for covert data in packet captures using extracted network features.
+    \end{itemize}
+
+    \item \textbf{Automated File-Type Routing}
+    \begin{itemize}
+        \item Design and train a file-type classifier to automatically identify the input file type (image, audio, or network packet).
+        \item Route the classified files to the corresponding steganalysis model.
+    \end{itemize}
+
+    \item \textbf{Unified Threat Assessment}
+    \begin{itemize}
+        \item Integrate all detection models into a unified system.
+        \item Output a clear risk score for each file: \textit{safe} or \textit{malicious}.
+    \end{itemize}
+
+    \item \textbf{Real-World Usability}
+    \begin{itemize}
+        \item Optimize detection algorithms to reduce false positives and avoid unnecessary alerts.
+        \item Ensure scalability to support batch processing of large volumes of files efficiently.
+    \end{itemize}
+\end{enumerate}
+
+\section{Literature Review and Theoretical Concepts}
+
+This section presents the theoretical foundations and related work that guided the development of our steganalysis system. We highlight key concepts such as steganography techniques across different modalities (image, audio, and network traffic), as well as the use of transfer learning in deep neural networks.
+
+\subsection{Steganography in Digital Media}
+
+Steganography is the practice of concealing information within digital media to prevent detection. Unlike encryption, which scrambles content, steganography hides the very existence of the message. The goal of steganalysis, therefore, is to detect the presence of such hidden content.
+
+\begin{itemize}
+  \item \textbf{Image Steganography:}
+  \begin{itemize}
+    \item \textbf{LSB (Least Significant Bit):} This method embeds secret data by replacing the least significant bits of pixel intensity values. For example, changing the last bit of a grayscale pixel value (e.g., from 100 to 101) causes negligible visual difference but can carry binary data.
+    
+    \item \textbf{WOW (Wavelet Obtained Weights):} This adaptive method minimizes distortion by assigning embedding costs based on wavelet filter responses. It embeds data in parts of the image that are less likely to reveal artifacts, typically in textured regions.
+
+    \item \textbf{HILL (High-pass, Low-pass, Low-pass):} This algorithm uses high-pass and low-pass filtering to guide embedding in noise-like areas of the image. It aims to reduce statistical detectability by spreading changes over perceptually insignificant regions.
+  \end{itemize}
+  
+  \item \textbf{Audio Steganography:}
+  \begin{itemize}
+    \item \textbf{CNV-QIM (Constrained Neighboring Vector Quantization Index Modulation):} This technique is specifically tailored for low bit-rate speech codecs like G.729a, which utilize Vector Quantization (VQ). CNV-QIM operates within the Linear Predictive Coding (LPC) domain by dividing the quantization codebook into two sub-codebooks—one for embedding a binary 0 and the other for a binary 1. To ensure imperceptibility, codewords are assigned such that neighboring vectors reside in different sub-codebooks (the CNV condition). During embedding, the encoder selects the nearest codeword from the relevant sub-codebook (0 or 1), ensuring low distortion and preserving audio quality.
+
+    \begin{figure}[H]
+    \centering
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/audio_steg/normal case.png}
+        \caption{The codeword choice in a normal case}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/audio_steg/cnv-qim.png}
+        \caption{the codeword choice using the CNV-QIM algorithm}
+    \end{minipage}
+    \end{figure}    
+
+
+    \item \textbf{PMS (Pitch Modulation Steganography):} PMS works by embedding secret data into a speech signal through subtle, imperceptible modifications of its pitch contour (the pattern of how the perceived pitch, or fundamental frequency, changes over time). It exploits the human ear's relative insensitivity to very small changes in pitch, especially when those changes are within the natural fluctuations of speech.
+    
+
+  \end{itemize}
+  
+  
+  \item \textbf{Network Steganography:}
+  \begin{itemize}
+    \item \textbf{TCP Header Manipulation:} This method embeds hidden data in rarely used or optional fields of protocol headers, such as TCP sequence numbers, reserved bits, or unusual flag combinations (e.g., SYN and FIN both set). These subtle alterations are often overlooked by intrusion detection systems, allowing covert data transmission without disrupting network functionality.
+
+    \begin{figure}[H]
+    \centering
+    \includegraphics[width=0.4\textwidth]{images/packet_steg/DataGram.png}
+    \caption{TCP Datagram}
+    \end{figure}
+    
+
+
+  \end{itemize}
+\end{itemize}
+
+\subsection{Transfer Learning in Deep Neural Networks}
+
+Transfer learning involves taking a pre-trained model—typically trained on large-scale datasets—and adapting it to a new, often smaller, task. It is particularly useful when domain-specific labeled data is limited.\vspace{0.3cm} \\
+In this project, we use a \textbf{ResNet34} architecture pre-trained on ImageNet. This allows us to leverage generic image features learned from large natural image datasets and fine-tune the model for steganography detection. 
+
+
+\newpage
+
+\section{Proposed solution }
+\subsection{Image Model}
+
+\indent The model architecture is based on \textbf{ResNet-34}, a residual neural network known for its depth and its ability to mitigate vanishing gradients through skip connections. This architecture is particularly suitable for steganalysis tasks due to its proven performance in image classification problems. \vspace{0.3cm}\\
+To enhance its capability in detecting subtle steganographic patterns, we adopted a transfer learning approach and augmented the ResNet-34 backbone with specialized components. These include  \textbf{SRM-based convolutional filters} for capturing steganographic noise residuals, and a dedicated \textbf{High Frequency Path} to emphasize frequency-sensitive details often modified in stego images. These additions integrate seamlessly as part of the model’s extended architecture and significantly improve its sensitivity to steganographic artifacts. \vspace{0.3cm} \\
+To tailor the ResNet-34 architecture to the steganalysis task, several modifications and enhancements were made:
+
+-- \textbf{Input Adaptation:} The first convolutional layer was adjusted to accept single-channel grayscale images instead of three-channel RGB inputs. This change aligns the model with the nature of the dataset used, which contains grayscale images. 
+
+\vspace{0.05cm} \\
+
+-- \textbf{Output Adaptation:} The final fully connected (FC) layer of ResNet-34 was replaced with a new layer that outputs four class probabilities. These correspond to the four categories of images in the dataset: clean, LSB stego, WOW stego, and HILL stego.
+
+
+\vspace{0.05cm} \\ 
+
+-- \textbf{SRM Filter Layer:} A Spatial Rich Model (SRM) filter layer was introduced to improve the model’s sensitivity to statistical artifacts and noise patterns typically introduced during steganographic embedding. These filters are designed to capture high-order residuals and edge-level inconsistencies.
+
+\vspace{0.1cm} \\
+
+-- \textbf{High-Frequency Path Layer:} A high-frequency enhancement layer was added to extract fine-grained image details. Since steganography often affects high-frequency regions of an image, this layer helps the model detect minute changes that may not be visible in lower-frequency components.  \vspace{0.3cm}\\
+These adaptations collectively enhance the model’s ability to identify and classify stego images by focusing on the statistical and structural features that are most likely to be altered during the embedding process.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/image_steg/image.png}
+    \caption{Image Model Architecture }
+\end{figure}
+
+
+\subsubsection{Dataset Description : BOSSbase + LSB generated}
+The dataset used in this study consists of a total of 8,000 grayscale images, equally distributed across four distinct classes (cover , LSB , WOW , HILL ) , with 2,000 images per class. Each image is resized to a uniform dimension of $256 \times 256$ pixels and has been manually labeled to reflect the type of steganographic content it contains.\vspace{0.3cm} \\
+The samples from classes cover , WOW and HILL are from the BOSSbase Dataset . Meanwhile, the samples from LSB class are generated from cover samples taken from BOSSbase with a python function that performs LSB . 
+This balanced class distribution ensures that the model is trained on a diverse and representative dataset, which is essential for effective multi-class steganalysis.
+
+% the audio model 
+\subsection{Audio Model}
+For the Audio steganography detection model we heavily worked on feature extraction and on teaching some models such RandomForst or xgboost
+
+\subsubsection{Dataset Description: VStego800k}
+For the audio steganalysis model, we used VStego800k, a large-scale dataset specifically designed for steganalysis in streaming voice data. The dataset consists of low bit-rate audio files encoded in G.729a format, with both training and testing sets composed of short, 1-second audio clips. Each sample is either a clean audio file or a steganographic file embedded with hidden data using one of two algorithms—CNV-QIM or PMS—selected at random. The embedding rates vary between 10\% and 40\%, allowing for controlled evaluation across different levels of steganographic intensity. To ensure diversity, the dataset includes a balanced mix of male and female voices in both Chinese and English.
+
+\subsubsection{Initial feature extraction}
+We started by extracting some basic audio features that provide an overall overview of the signal such as 
+\begin{itemize}
+    \item \textbf{Mel-Frequency Cepstral Coefficient (MFCC): }a feature extremely used in automatic speech recognision, efficiently represents the overall shape or spectral enveloppe of the sound within short frames (10-20ms long). It computes the energy distribution across the spectrum and applies a series of Mel-scaled triangular filters which effectively group and sum energy within frequency bands that are perceptually more relevant to human hearing. After taking the logarithm of these band energies, a Discrete Cosine Transform (DCT) is applied
+    \item \textbf{Spectral Centroid: } It is described as the center of mass of the spectrum it's calculated by this formula. 
+
+    \begin{equation}
+        \text{Spectral Centroid =} \frac{\sum_{k=1}^{N} f_{k}.S_{k}}{\sum_{k=1}^{N} S_{k}}
+    \end{equation}
+    \textit{where :
+    \begin{itemize}
+        \item $f_{k}$ : the frequency of bin k
+        \item $S_{k}$: the magnitude of the spectrum at frequency $f_{k}$
+        \item N: total number of frequency bins
+    \end{itemize}
+    }
+
+It helps detect the presence of steganography that introduces shift energy distribution across frequencies.
+
+    \item \textbf{spectral Bandwidth: } measures the dispertion of the spectrum around its centroid. 
+    \begin{equation}
+        \text{Spectral Bandwidth=}\sqrt{\frac{\sum_{k=1}^{N} (f_{k}-\text{centroid})².S_{k}}{\sum_{k=1}^{N} S_{k}}}
+    \end{equation}
+    \item \textbf{Spectral Flatness: }quantifies how noise-like or tone-like a sound is. It is a useful indicator of spectral irregularities led by the CNV-QIM algorithm.
+    \item \textbf{Zero Crossing rate: }the rate at which the sign of the audio signal changes.It helps detecting subtle changes in the waveform's periodicity due to pitch manipulation.
+but these features aren't enough for the classification.
+\end{itemize}
+
+\subsubsection{Updated feature extraction}
+Since CNV-QIM directly alters the LPC domain, it was logical to extract LPC-based features.
+\textbf{Linear Predictive Coding (LPC)} is a widely used technique in digital audio signal processing, particularly for speech. Its primary purpose is to efficiently represent the spectral envelope of a speech signal in a highly compressed form.\vspace{0.3cm} \\
+It analyzes short segments of the speech wave to find a set of linear prediction coefficients. These coefficients allow for predicting the current speech sample as a linear combination of past samples as represented by the Fundemental LPC Prediction equation.
+
+\begin{equation}
+    \hat{S}(n)= \sum_{k=1}^{p} a_{k} \hat{S}(n-k)
+\end{equation}
+
+\textit{\\$\hat{S}(n)$: the predicted value of the speech signal at time $n$ \\
+$\hat{S}(n-k)$: the past samples of the speech signal \\
+$p$: the order of the LPC model \\
+$a_{k}$: the LPC coefficients \vspace{0.3cm} \\
+}
+The resulting set of coefficients effectively describes the resonant characteristics (formants) of the vocal tract during that segment.
+Using an LPC order of 12, we computed the mean, variance, and delta (inter-coefficient differences) for each audio sample.
+
+\subsubsection{Updated Model:}
+Since we're working on wav files, the steganographic alterations are deluted and more subtle. To address this, we replaced the Random Forest classifier with \textbf{XGBoost}, which is known for its higher sensitivity to small feature variations and its ability to capture complex patterns in data. 
+
+\newpage
+
+\subsection{Network Model Architecture}
+
+\subsubsection{Flow-Based Detection Using Classical Machine Learning}
+
+\indent The architecture for the network-based steganography detection model is grounded in classical machine learning, leveraging flow-based features extracted from packet captures (PCAPs) using CICFlowMeter. This choice is motivated by the structured nature of network traffic and the statistical anomalies introduced by steganographic embedding in TCP/IP header fields. Unlike the image model, which benefits from spatial representation, the network model focuses on flow-level behavioral patterns and statistical signatures. \vspace{0.3cm} \\
+
+The model pipeline consists of three stages: \textbf{flow generation}, \textbf{synthetic stego injection}, and \textbf{classification} using an ensemble tree-based model. The use of a \textbf{Random Forest classifier} is justified by its robustness, interpretability, and ability to handle high-dimensional tabular data without requiring feature scaling or complex architecture tuning. Additionally, this model serves as a lightweight yet effective baseline for real-time steganography detection in packet streams.
+
+\vspace{0.3cm}
+
+\textbf{Stage 1: Flow Generation from PCAP using CICFlowMeter}\\
+Raw PCAP files are converted into structured flows using CICFlowMeter, a tool that extracts over 80 statistical features per bidirectional connection. These include metrics such as `Flow Duration`, `Total Forward Packets`, `Average Packet Size`, and inter-arrival times. This flow-based representation captures temporal and volumetric patterns at a granularity appropriate for detecting behavioral deviations caused by stego algorithms.
+
+\vspace{0.2cm}
+
+\textbf{Stage 2: Steganographic Injection and Labeling}\\
+To simulate stego traffic, we programmatically modify selected TCP header fields—such as Sequence Number, Window Size, URG Flag, and Header Length—in a subset of flows, while ensuring protocol compliance. These injected samples are labeled as \textit{Stego (1)}, and the rest as \textit{Benign (0)}, forming a balanced binary classification dataset. The manipulation is subtle and preserves flow validity, mimicking real-world steganographic techniques that avoid detection by signature-based firewalls.
+
+\vspace{0.2cm}
+
+\textbf{Stage 3: Classification with Random Forest}\\
+After cleaning and preprocessing the dataset (including NaN handling, correlation-based feature pruning, and normalization), a Random Forest classifier is trained. We tuned hyperparameters such as tree depth, number of estimators, and split criteria via grid search. The model is trained using 5-fold cross-validation to prevent overfitting and evaluated on metrics such as Accuracy, Precision, Recall, F1-score, and ROC-AUC. Feature importance analysis reveals that TCP-specific metrics (like `Init Win bytes forward` and `URG Flag Count`) play a critical role in detecting anomalies.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/packet_steg/network_architecture.png}
+    \caption{Network Steganography Detection Model Pipeline}
+\end{figure}
+
+\subsubsection{Dataset Description: CICFlowMeter + CICIDS2017 Traffic}
+The dataset used for this model is derived from the CICIDS2017-Thursday morning traffic PCAP files, processed via CICFlowMeter to extract flow-based statistical features. The resulting CSV file contains network flows with labeled classes, including both benign and attack traffic (e.g., Brute Force, DoS). To adapt this dataset for steganalysis, we manually injected stego-like modifications into TCP headers for selected benign flows, creating a labeled binary classification task: Stego (modified) and Benign (unmodified). Class balance was maintained to ensure fair learning and unbiased evaluation. The final dataset contains $\sim$40,000 labeled flows, split into training and testing sets using stratified sampling.
+
+
+
+
+
+
+
+\newpage
+\section{Implementation and Results}
+
+\subsection{Image Model }
+\subsubsection{Workflow during training}
+\textbf{Phase 1: Baseline Training}\vspace{0.5cm} \\
+In Phase 1, a ResNet34 model, pre-trained on ImageNet, is adapted for steganalysis to classify grayscale images into four classes: Cover, LSB, WOW, and HILL. The first convolutional layer is modified to handle single-channel input, with weights initialized by averaging the original RGB weights and applying Kaiming normalization. The classifier head is replaced with a custom sequence including dropout (0.5 and 0.3), a 256-unit linear layer, batch normalization, LeakyReLU (0.1), and a final linear layer for four-class output. Only the final ResNet block (layer4) and classifier head are trainable, optimized using AdamW with learning rates of 3e-5 and 1e-4, respectively, and a cosine annealing scheduler. Training runs for up to 10 epochs with early stopping after 7 epochs without improvement, using CrossEntropyLoss, mixed precision via GradScaler, and gradient clipping. Performance is evaluated on validation data using accuracy, F1-score, AUC, and Cohen’s Kappa, with the best model saved based on validation accuracy.\vspace{0.5cm} \\
+\textbf{Phase 2: Full Attention Fine-tuning} \vspace{0.5cm} \\
+In Phase 2, the Phase 1 ResNet34 model is augmented with a Spatial Rich Model (SRM) layer and a High-Frequency Path (HighFreqPath) to enhance steganalysis for classifying grayscale images into Cover, LSB, WOW, and HILL classes. The SRM layer uses fixed convolutional filters (Laplacian, Gabor, Hybrid Edge) to extract steganographic features, while the HighFreqPath employs trainable convolutions for high-frequency patterns. The ResNet34’s first convolutional layer is modified to accept five channels (three from SRM, two from reduced HighFreqPath), and a new classifier head combines ResNet features (512 dimensions) with HighFreqPath features (3136 dimensions). Only the SRM layer, HighFreqPath, first convolution, layer4, and classifier are trainable, optimized with AdamW (learning rates: 1e-4 for SRM/HighFreqPath, 1e-5 for first convolution/layer4, 5e-4 for classifier) and a cosine annealing scheduler. Training proceeds for up to 15 epochs, with early stopping after 7 epochs without improvement, using CrossEntropyLoss, mixed precision, and gradient clipping. Performance is assessed with accuracy, F1-score, AUC, and Cohen’s Kappa, saving the best model based on validation accuracy.
+\subsubsection{Results and interpretations}
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/image_steg/chart.png}
+        \caption{Confusion Matrix}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/image_steg/train loss over epochs.png}
+        \caption{Training Loss over Epochs}
+    \end{minipage}
+\end{figure}
+
+The steganalysis model, a modified ResNet34 architecture enhanced with Spatial Rich Model (SRM) filters and a High Frequency Path (HighFreqPath) module, achieved a test set accuracy of approximately 59\% on a balanced dataset of 8,000 grayscale images (2,000 per class: Cover, LSB, WOW, HILL). This indicates moderate classification performance and highlights the difficulty in distinguishing between various steganographic techniques.\vspace{0.3cm} \\
+The model demonstrates the highest performance on \textbf{Cover} images, with an F1 score ranging from approximately 0.65 to 0.70. This is likely due to the absence of embedded artifacts in cover images, which makes them more distinguishable. Performance on the \textbf{LSB} (Least Significant Bit) class is reasonably good as well, with F1 scores between 0.60 and 0.65, attributed to its detectable pixel-level modifications.\vspace{0.3cm} \\
+However, the model struggles significantly with the \textbf{WOW} (Wavelet Obtained Weights) and \textbf{HILL} (High-pass, Low-pass, and Local prediction) steganographic methods. The F1 scores for WOW range from 0.50 to 0.55, and for HILL from 0.45 to 0.50. These methods use adaptive embedding schemes designed to minimize detectable statistical distortions, which makes accurate classification more difficult.\vspace{0.5cm} \\
+Analysis of the confusion matrix reveals several key insights:
+\begin{itemize}
+    \item \textbf{Cover} images are occasionally misclassified as \textbf{HILL}, likely due to HILL's subtle embedding strategy.
+    \item \textbf{WOW} and \textbf{HILL} are frequently confused with each other, as both employ wavelet-based and adaptive embedding techniques that result in similar statistical signatures.\vspace{0.1cm} \\
+\end{itemize}
+These findings suggest that while the incorporation of SRM filters and the HighFreqPath module does improve feature extraction, the model still requires further refinement. Future improvements could involve more sophisticated feature representations, additional data augmentation, or ensemble learning techniques to enhance differentiation between complex steganographic methods.
+
+
+\subsection{Audio Model}
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/audio_steg/cap_lpc_results.png}
+        \caption{The model's stats}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/audio_steg/conf_matrix_lpc.png}
+        \caption{the confusion matrix}
+    \end{minipage}
+\end{figure}
+\\ 
+These are the best results we could achieve. The model seems to guess slightly better than totally at random, reaching an accuracy of 0.57. The classificaiton report shows relatively balanced precision and recall for both classes,  with a slight advantage in detecting clean files (precision: 0.56, recall: 0.58) over stego files (precision: 0.57, recall: 0.54)
+
+
+\subsection{Network Model Performance and Evaluation}
+
+The Random Forest-based steganalysis model for network traffic achieved a high classification accuracy of \textbf{94.57\%}, highlighting its effectiveness in identifying steganographic patterns embedded within TCP header fields. The model was trained on a balanced dataset containing clean and synthetically injected stego traffic, and evaluated using standard classification metrics.
+
+\vspace{0.3cm}
+\textbf{Precision} and \textbf{Recall} scores show that the model is highly capable of distinguishing between clean and steganographic flows:
+\begin{itemize}
+    \item For the \textbf{Clean} class:
+    \begin{itemize}
+        \item Precision: \textbf{0.92}
+        \item Recall: \textbf{0.98}
+        \item F1-score: \textbf{0.95}
+    \end{itemize}
+    \item For the \textbf{Stego} class:
+    \begin{itemize}
+        \item Precision: \textbf{0.98}
+        \item Recall: \textbf{0.91}
+        \item F1-score: \textbf{0.94}
+    \end{itemize}
+\end{itemize}
+
+\vspace{0.3cm}
+The high precision for the \textbf{Stego} class indicates that the model rarely misclassifies clean flows as steganographic (i.e., few false positives), while the high recall for the \textbf{Clean} class demonstrates its ability to correctly identify the majority of clean traffic.
+
+\subsubsection*{Confusion Matrix Analysis}
+
+\begin{itemize}
+    \item Out of 3942 clean flows, only \textbf{79} were misclassified as stego, indicating excellent specificity.
+    \item Out of 3996 stego flows, \textbf{352} were misclassified as clean, showing that the model still struggles slightly with steganographic traffic designed to preserve normal statistical patterns.
+    \item The confusion between clean and stego traffic remains relatively low, but the false negatives in the stego class suggest that more subtle or sophisticated embedding techniques (e.g., minimally perturbing sequence numbers or using rarely monitored header fields) may evade detection.
+\end{itemize}
+
+\subsubsection*{Macro vs. Weighted Averages}
+Both the macro and weighted averages for precision, recall, and F1-score are at \textbf{0.95}, further confirming the model’s balanced performance across both classes. This is crucial in steganalysis, where the cost of false negatives (missed stego) is often as critical as false positives.
+
+
+
+
+
+\begin{figure}[h]
+    \centering
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/packet_steg/report.png}
+        \caption{The model's stats}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.45\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{images/packet_steg/confusion matrix.png}
+        \caption{the confusion matrix}
+    \end{minipage}
+\end{figure}
+
+
+
+
+\subsection{Application Interface and Workflow}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/image_steg/app_workflow.png}
+    \caption{Application Workflow }
+\end{figure}
+
+\subsection{Application Interface and Workflow}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{images/image_steg/Interface.png}
+    \caption{Application Workflow }
+\end{figure}
+The AI Model Testing Interface, built with Streamlit, is a minimalist and user-friendly platform designed for uploading and testing various data files—images (e.g., .pgm, .png, .jpg, .jpeg, .bmp), audio (.wav), or network traffic (.csv)—against preloaded machine learning models . It features a straightforward drag-and-drop or browse upload mechanism with a 200MB file size limit, making it ideal for testing the steganalysis models on new files.
+\newpage
+
+\section{Discussions and potential improvements}
+\subsection{Audio Model}
+The audio model currently performs poorly, likely due to the conversion from .g729a to WAV, which weakens the already subtle steganographic traces. To improve detection, several strategies can be explored:
+
+\begin{itemize}
+    \item Extract higher-order statistical features that are more sensitive to subtle modifications.
+    \item Analyze inter-frame correlations, as steganography often operates frame-by-frame.
+    \item Study inter-feature relationships, which may be disrupted by embedding.
+    \item Use more complex models like 2D CNNs applied to spectrograms or Mel-spectrograms. These capture time-frequency patterns and can learn steganographic cues automatically, bypassing some limitations of hand-crafted features.
+\end{itemize}
+
+\subsection{Image Model : }
+
+
+The steganography detection model shows promising results but there is a lot of room for improvement and can be enhanced for better performance while managing computational costs. Below are key improvements and strategies for efficient deployment.\\ 
+
+% Model Improvements
+\textbf{Model Improvements} 
+\begin{itemize}
+    \item \textbf{Gradual Unfreezing of ResNet34 Layers}: Unfreeze earlier layers (e.g., layer3, layer2) to fine-tune deeper features, improving detection of subtle stego patterns, especially for WOW and HILL classes.
+    \item \textbf{Spatial and Channel Attention Blocks}: Add CBAM or SE blocks to focus on critical image regions and channels, enhancing detection of faint stego artifacts.
+    \item \textbf{Patch-Based Feature Extraction}: Divide images into patches for detailed analysis, boosting accuracy for subtle embeddings at higher computational cost.
+\end{itemize}
+
+% Computational Optimization
+\textbf{Computational Optimization}
+\begin{itemize}
+    \item \textbf{Cloud Deployment}: Use cloud servers (e.g., AWS, Google Cloud) with GPU/TPU support for efficient training and inference.
+    \item \textbf{Optimization Techniques}: Leverage mixed-precision training, pruning, or quantization to reduce memory and speed up processing.
+    \item \textbf{Batch Size Tuning}: Optimize batch sizes (starting from 32) for memory and stability.
+\end{itemize}
+
+\subsection{Network Model}
+
+The network-based steganalysis model demonstrates strong performance, achieving an accuracy of 94.57\% when classifying between clean and stego-injected network flows. However, there are both practical challenges and enhancement opportunities to consider.
+
+\vspace{0.3cm}
+\textbf{Limitations and Areas for Improvement}
+\begin{itemize}
+    \item \textbf{False Negatives in Stego Class}: The model tends to miss a portion of stego traffic (recall = 0.91), especially when the embedding strategy minimally alters packet fields.
+    \item \textbf{Static Feature Limitations}: Current detection relies heavily on handcrafted features from TCP headers due to \textit{the lack of open source ressources}, which may not capture deeper contextual or sequential anomalies.
+\end{itemize}
+
+\vspace{0.3cm}
+\textbf{Future Enhancements}
+\begin{itemize}
+    \item \textbf{Sequence-Aware Models}: Incorporate LSTM or Transformer-based architectures to analyze temporal patterns in packet flows, improving detection of low-rate or adaptive steganography.
+    \item \textbf{Feature Expansion}: Include features from other layers (e.g., IP or application) or statistical aggregations over multiple packets to enrich context.
+    \item \textbf{Ensemble Learning}: Combine multiple models (e.g., Random Forest + XGBoost + DNN) to improve robustness across varying stego techniques.
+\end{itemize}
+
+
+
+
+% Conclusion
+\subsection{Conclusion}
+These enhancements, paired with cloud-based deployment and optimization, will improve accuracy and scalability for steganography detection.
+
+
+\newpage
+\section{Conclusion}
+This project explored machine learning approaches for detecting steganographic content in audio, image, and network data. Across the three domains, we developed specialized models tailored to the nature of the embedded information.\vspace{0.3cm} \\
+The Random Forest classifier for synthetically modified network packets produced strong and reliable results. While the ResNest-based model applied to the image steganalysis and the audio model showed decent and promising performance. \vspace{0.3cm} \\
+All three models were integrated into a Streamlit application that automatically detects the file type and routes it to the appropriate model.\vspace{0.3cm} \\
+Overall, the project demonstrates the potential of machine learning in steganalysis across multiple data types, while highlighting the need for further refinement for real life applications.
+
+\newpage
+\section{References}
+
+\begin{itemize}
+    \item [1] \url{https://www.researchgate.net/publication/3343272_Steganalysis_of_LSB_matching_in_grayscale_images}
+    \item [2] \url{https://ieeexplore.ieee.org/document/6197267}
+    \item  [3] \url{https://www.sciencedirect.com/science/article/abs/pii/S138904171930511X}
+    \item  [3] \url{https://www.researchgate.net/publication/354122133_Ocular_Disease_Detection_Using_Advanced_Neural_Network_Based_Classification_Algorithms}
+    \item [4] 
+    \url{https://pytorch.org/hub/pytorch_vision_resnet/}
+    \item[5]
+    \url{https://www.researchgate.net/publication/221286432_An_Approach_to_Information_Hiding_in_Low_Bit-Rate_Speech_Stream}
+    \item[6]
+    \url{https://taylorandfrancis.com/knowledge/Engineering_and_technology/Engineering_support_and_special_topics/LPC/}
+    \item[7]
+    \url{https://www.mdpi.com/1999-5903/12/1/17}
+    \item[8]
+    \url{https://ieeexplore.ieee.org/abstract/document/8943350}
+
+    \item[9]
+    \url{https://colab.ws/articles/10.1007%2F978-3-031-53488-1_37?utm_source=chatgpt.com}
+
+    \item[10]    \url{https://medium.com/%40darshan.nere/introduction-to-network-steganography-14c2bbecc609}
+
+    \item[11]    \url{https://www.sciencedirect.com/science/article/abs/pii/S0957417424016634?utm_source=chatgpt.com}
+    \item[12]    
+    \url{http://cicresearch.ca/}
+    
+    
+    
+\end{itemize}
+
+
+\end{document}
